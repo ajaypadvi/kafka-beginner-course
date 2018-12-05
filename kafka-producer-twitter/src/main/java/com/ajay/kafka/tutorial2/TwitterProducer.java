@@ -26,21 +26,23 @@ public class TwitterProducer {
     Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
     // use your own credentials - don't share them with anyone
-    String consumerKey = "";
-    String consumerSecret = "";
-    String token = "";
-    String secret = "";
+    String consumerKey = "ETpi0udCSsivMxzGVS6wpKNRM";
+    String consumerSecret = "SwKI5sWRKv1Uea5ypYx3he1ufmc91JDWcb78b53PJBQRszTiO2";
+    String token = "140387212-L62tgvgQW4vDQykoBDuRl7HUNjCWG7IPoosoPVsc";
+    String secret = "Xb5Yp9g9JISruezK04puezZepiaRhlLYFhT82S4EvyBfJ";
 
-    List<String> terms = Lists.newArrayList("bitcoin", "usa", "politics", "sport", "soccer");
+    List<String> terms = Lists.newArrayList("india");
+    private final static String TOPIC_NAME = "twitter_topic";
 
 
-    public TwitterProducer(){}
+    public TwitterProducer() {
+    }
 
     public static void main(String[] args) {
         new TwitterProducer().run();
     }
 
-    public void run(){
+    public void run() {
 
         logger.info("Setup");
 
@@ -75,9 +77,9 @@ public class TwitterProducer {
                 e.printStackTrace();
                 client.stop();
             }
-            if (msg != null){
+            if (msg != null) {
                 logger.info(msg);
-                producer.send(new ProducerRecord<>("twitter_tweets", null, msg), new Callback() {
+                producer.send(new ProducerRecord<>(TOPIC_NAME, null, msg), new Callback() {
                     @Override
                     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
                         if (e != null) {
@@ -90,7 +92,7 @@ public class TwitterProducer {
         logger.info("End of application");
     }
 
-    public Client createTwitterClient(BlockingQueue<String> msgQueue){
+    public Client createTwitterClient(BlockingQueue<String> msgQueue) {
 
         /** Declare the host you want to connect to, the endpoint, and authentication (basic auth or oauth) */
         Hosts hosebirdHosts = new HttpHosts(Constants.STREAM_HOST);
@@ -112,7 +114,7 @@ public class TwitterProducer {
         return hosebirdClient;
     }
 
-    public KafkaProducer<String, String> createKafkaProducer(){
+    public KafkaProducer<String, String> createKafkaProducer() {
         String bootstrapServers = "127.0.0.1:9092";
 
         // create Producer properties
@@ -130,7 +132,7 @@ public class TwitterProducer {
         // high throughput producer (at the expense of a bit of latency and CPU usage)
         properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
         properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
-        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024)); // 32 KB batch size
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024)); // 32 KB batch size
 
         // create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
